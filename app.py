@@ -15,7 +15,7 @@ def summarize_text(input_text):
     Returns:
         str: The summary of the input text.
     """
-    model_name = "llama3.2"
+    model_name = "llama3.2-vision"
     prompt = f"Summarize the following text concisely and accurately. Provide only the summary, without any additional comments or introductions:\n\n{input_text}"
     try:
         messages = [{'role': 'user', 'content': prompt}]
