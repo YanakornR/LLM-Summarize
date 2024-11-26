@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException, Form
 app = FastAPI()
 
 # summarize function
-def summarize_text(input_text):
+def summarize_text(input_text, total_words):
     """
     Summarizes the given text using the specified Ollama model.
     
@@ -16,7 +16,7 @@ def summarize_text(input_text):
         str: The summary of the input text.
     """
     model_name = "llama3.2"
-    prompt = f"Summarize the following text concisely and accurately. Provide only the summary, without any additional comments or introductions:\n\n{input_text}"
+    prompt = f"Summarize the following text concisely and accurately in approximately {total_words} words. Provide only the summary, without any additional context, commentary, or introductory statements:\n\n{input_text}"
     try:
         messages = [{'role': 'user', 'content': prompt}]
         response = ollama.chat(model=model_name, messages=messages)
@@ -26,12 +26,15 @@ def summarize_text(input_text):
 
 # api endpoint
 @app.post("/summarize/")
-async def summarize(text: str = Form(...)):
+async def summarize(
+        text: str = Form(...),
+        total_words: int = Form(...),
+    ):
     """
     API endpoint to summarize a given text using Ollama.
     """
     try:
-        summary = summarize_text(text)
+        summary = summarize_text(text, total_words)
         if summary.startswith("An error occurred"):
             raise HTTPException(status_code=500, detail=summary)
         return {"summary": summary}
